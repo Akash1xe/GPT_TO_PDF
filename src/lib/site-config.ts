@@ -3,7 +3,7 @@ export const siteConfig = {
   description:
     "A thoughtful home for exporting ChatGPT conversations as beautifully structured PDFs.",
   websiteRepository:
-    "https://github.com/Akash1xe/Website_chatGpt_to_PDF",
+    "https://github.com/Akash1xe/GPT_TO_PDF",
   extensionRepository:
     "https://github.com/Akash1xe/newGptTopdf",
   currentChunk: 12,
