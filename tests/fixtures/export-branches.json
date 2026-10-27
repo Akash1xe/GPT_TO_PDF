@@ -1,0 +1,66 @@
+[
+  {
+    "id": "regression-branch",
+    "title": "Fixture with edit and attachment",
+    "current_node": "reply-b",
+    "mapping": {
+      "root": {
+        "id": "root",
+        "parent": null,
+        "message": null
+      },
+      "user": {
+        "id": "user",
+        "parent": "root",
+        "message": {
+          "id": "user",
+          "author": {
+            "role": "user"
+          },
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Could you summarize **this diagram**?"
+            ]
+          }
+        }
+      },
+      "reply-a": {
+        "id": "reply-a",
+        "parent": "user",
+        "message": {
+          "id": "reply-a",
+          "author": {
+            "role": "assistant"
+          },
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Old regenerated reply, must not leak."
+            ]
+          }
+        }
+      },
+      "reply-b": {
+        "id": "reply-b",
+        "parent": "user",
+        "message": {
+          "id": "reply-b",
+          "author": {
+            "role": "assistant"
+          },
+          "content": {
+            "content_type": "multimodal_text",
+            "parts": [
+              "## Current answer\n\n- One\n- Two\n\n```python\nprint(1)\n```",
+              {
+                "content_type": "image_asset_pointer",
+                "asset_pointer": "file-service://private/image"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+]

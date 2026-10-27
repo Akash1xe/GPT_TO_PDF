@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head><title>Search index and diagram | ChatGPT</title></head>
+<body>
+ <main>
+  <article data-message-author-role="user" data-message-id="fixture-u1">
+   <div data-message-content><p>Explain <strong>binary search</strong> with a diagram and complexity.</p></div>
+  </article>
+  <article data-message-author-role="assistant" data-message-id="fixture-a1">
+   <div data-message-content>
+    <h2>Binary search</h2>
+    <p>Search a <a href="https://example.org/sorted">sorted array</a> in halves.</p>
+    <ol><li>Find the middle.</li><li>Discard half.</li><li>Repeat.</li></ol>
+    <pre><code class="language-cpp">int mid = (low + high) / 2;</code></pre>
+    <p>Time complexity <span data-latex="O(\log n)"></span>.</p>
+    <table><thead><tr><th>Stage</th><th>Index</th></tr></thead><tbody><tr><td>Middle</td><td>4</td></tr></tbody></table>
+    <figure>
+      <svg viewBox="0 0 320 80" role="img" aria-label="binary search branches">
+        <rect x="8" y="8" width="100" height="40" fill="#cce7dd"/>
+        <path d="M110 30 L180 30" stroke="#267c5d"/>
+        <text x="190" y="35">Next half</text>
+      </svg>
+      <figcaption>Search range</figcaption>
+    </figure>
+    <section style="background-color:#eff8f2;border:1px solid #267c5d"><p>Always compare with the middle.</p></section>
+    <div><script>window.__injected=true</script><img src="javascript:alert(1)" width="350" height="180" alt="Unsafe asset placeholder"></div>
+  </div>
+  </article>
+  <article data-message-author-role="user" data-message-id="fixture-u2">
+   <p>Thanks!</p>
+  </article>
+ </main>
+</body></html>

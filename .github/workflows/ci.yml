@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Test, typecheck, lint, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          package-manager-cache: false
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Quality gate
+        run: npm run check
+      - name: Check preinstalled Google Chrome
+        run: google-chrome --version
+      - name: Browser rendering and generated-PDF tests
+        run: npm run test:browser
+      - name: Archive PDF and screenshot regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-quality-regression
+          if-no-files-found: ignore
+          retention-days: 7
+          path: |
+            test-results/
+            playwright-report/
