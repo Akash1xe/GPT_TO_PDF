@@ -7,6 +7,26 @@ import { parseSemanticBlocks, semanticBlocksToPlainText } from "@/lib/extractors
 const renderer = new Marked({
   gfm: true,
   breaks: false,
+  extensions: [
+    {
+      name: "latexBlock", level: "block",
+      start(source) { const matches=[source.indexOf("\\["),source.indexOf("$$")].filter(i=>i>=0);return matches.length?Math.min(...matches):undefined; },
+      tokenizer(source) {
+        const match=/^ {0,3}(?:\\\[([\s\S]+?)\\\]|\$\$([\s\S]+?)\$\$)[ \t]*(?:\n|$)/.exec(source);
+        if(match)return {type:"latexBlock",raw:match[0],text:(match[1]??match[2]).trim()};
+      },
+      renderer(token) { return `<div data-tex="${escapeHtml(String(token.text))}"></div>\n`; },
+    },
+    {
+      name: "latexInline", level: "inline",
+      start(source) { const matches=[source.indexOf("\\("),source.indexOf("$")].filter(i=>i>=0);return matches.length?Math.min(...matches):undefined; },
+      tokenizer(source) {
+        const match=/^\\\(([\s\S]+?)\\\)/.exec(source)??/^\$(?![\s$])((?:\\.|[^$\\\n])+?)(?<!\s)\$(?!\d)/.exec(source);
+        if(match)return {type:"latexInline",raw:match[0],text:match[1].trim()};
+      },
+      renderer(token) { return `<span data-tex="${escapeHtml(String(token.text))}"></span>`; },
+    },
+  ],
   renderer: {
     // ChatGPT export text can itself contain raw HTML; render as inert text,
     // never as a style/control/media element.

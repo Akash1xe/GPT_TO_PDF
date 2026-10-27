@@ -4,6 +4,19 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { richFixture, longFixture, preferences } from "./fixtures.mjs";
 
+test("a final message that fits the page does not add a blank page from trailing spacing",async({context})=>{
+ const conversation=longFixture(1);
+ conversation.messages[0].blocks=[{type:"paragraph",children:[{type:"text",text:"FINAL_PAGE_MARKER"}]}];
+ const {popup}=await openPrint(context,conversation,preferences({includeTitle:false,includeExportDate:false,marginPreset:"compact",messagePadding:"compact",messageSpacing:"compact",bodyFontSize:8}));
+ await popup.addStyleTag({content:'@media print { .message-role {display:none;} .message-body {padding-top:0;} .message-body p {height:calc(297mm - 16mm - 2px);margin:0;} }'});
+ const bytes=await popup.pdf({preferCSSPageSize:true});
+ const task=getDocument({data:new Uint8Array(bytes),useSystemFonts:true});
+ const pdf=await task.promise;
+ expect(pdf.numPages).toBe(1);
+ expect((await (await pdf.getPage(1)).getTextContent()).items.map(item=>item.str).join(" ")).toContain("FINAL_PAGE_MARKER");
+ await task.destroy();
+});
+
 async function openPrint(context, conversation, settings) {
  const opener=await context.newPage();
  await opener.goto("/");

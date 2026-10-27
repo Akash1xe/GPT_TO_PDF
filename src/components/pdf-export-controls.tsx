@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ConversationData } from "@/lib/conversation/conversation";
 import { DEFAULT_EXPORT_PREFERENCES, type ExportPreferences } from "@/lib/conversation/preferences";
 import { openPrintPreview } from "@/lib/pdf/print-job";
+import { countExternalImages } from "@/lib/pdf/external-media";
 
 type Choice<K extends keyof ExportPreferences> = {
   field: K;
@@ -23,13 +24,14 @@ export function PdfExportControls({ conversation }: { conversation: Conversation
   const [preferences, setPreferences] = useState<ExportPreferences>(DEFAULT_EXPORT_PREFERENCES);
   const [error, setError] = useState("");
   const [allowExternalImages, setAllowExternalImages] = useState(false);
+  const onlineImages=countExternalImages(conversation);
   const update = <K extends keyof ExportPreferences>(key: K, value: ExportPreferences[K]) =>
     setPreferences((current) => ({ ...current, [key]: value }));
 
-  function open() {
+  function open(includeImages=allowExternalImages) {
     setError("");
     try {
-      openPrintPreview(conversation, preferences, allowExternalImages);
+      openPrintPreview(conversation, preferences, includeImages);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not open the print preview.");
     }
@@ -91,7 +93,17 @@ export function PdfExportControls({ conversation }: { conversation: Conversation
           Images supplied only as internal ChatGPT file references stay labeled as unavailable; browser capture with embedded images is required for those.
         </p>
       )}
-      <button onClick={open} type="button"
+      {onlineImages>0&&!allowExternalImages&&(
+        <div className="mt-4 rounded-lg border border-[#d8e3ca] bg-[#f6faef] p-3 text-xs leading-5 text-[#355941]">
+          <p>This chat contains {onlineImages} online illustration(s). Include them to preserve the diagrams shown in ChatGPT. This contacts their image hosts.</p>
+          <button type="button" onClick={()=>{setAllowExternalImages(true);open(true);}}
+            className="mt-2 w-full rounded-lg bg-[#174d36] px-4 py-3 text-sm font-semibold text-white">
+            Preview PDF with {onlineImages} online images
+          </button>
+          <p className="mt-2">The button below keeps images disabled and shows labeled placeholders.</p>
+        </div>
+      )}
+      <button onClick={()=>open()} type="button"
         className="mt-4 w-full rounded-lg bg-[#174d36] px-5 py-3 text-sm font-semibold text-white hover:bg-[#136342]">
         Open print preview / Save as PDF
       </button>

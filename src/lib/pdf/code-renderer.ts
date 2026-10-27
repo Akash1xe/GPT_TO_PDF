@@ -5,6 +5,9 @@ import { highlightCodeLines } from "@/lib/extractors/fallback-code-highlighter";
 
 export function renderCodeBlock(document: Document, block: CodeBlock, preferences: ExportPreferences): HTMLElement {
   const wrapper = el(document, "figure", `code-block code-theme-${preferences.pdfTheme === 'dark' ? 'dark' : preferences.codeTheme}`);
+  if (block.language?.toLowerCase() === "mermaid" || block.displayLanguage?.toLowerCase() === "mermaid") {
+    wrapper.dataset.diagramLanguage = "mermaid";
+  }
   if (block.lineCount <= 18) wrapper.classList.add("code-short");
   if (block.hasLongLines) wrapper.classList.add("code-has-long-lines");
   if (preferences.wrapCode) wrapper.classList.add("code-wrap");

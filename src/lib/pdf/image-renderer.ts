@@ -1,5 +1,5 @@
 import type { ImageBlock } from "@/lib/conversation/content";
-import { supportedImageSource } from "@/lib/conversation/urls";
+import { safeSourceUrl, supportedImageSource } from "@/lib/conversation/urls";
 import { descendants, parseHtmlTree, tag } from "@/lib/extractors/html-tree";
 import { serializeSafeSvg } from "@/lib/extractors/chatgpt-media";
 import { el } from "./dom";
@@ -44,8 +44,23 @@ export function renderImage(document: Document, block: ImageBlock): HTMLElement 
   }
   if (block.caption) {
     const caption = el(document, "figcaption");
-    caption.textContent = block.caption;
+    const href=block.captionHref&&safeSourceUrl(block.captionHref);
+    if(href){
+      const link=el(document,"a");link.href=href;link.rel="noreferrer noopener";link.textContent=block.caption;
+      caption.appendChild(link);
+    }else caption.textContent = block.caption;
     figure.appendChild(caption);
   }
   return figure;
+}
+
+/** Replace unsettled image elements before printing so no blank assets remain. */
+export function markUnavailableImages(document: Document): number {
+  for(const image of Array.from(document.querySelectorAll<HTMLImageElement>(".media-block img"))){
+    if(image.complete&&image.naturalWidth>0)continue;
+    const placeholder=el(document,"div","media-placeholder");
+    placeholder.textContent=`[Image unavailable: ${image.alt||"Conversation image"}. The image did not finish loading.]`;
+    image.replaceWith(placeholder);
+  }
+  return document.querySelectorAll(".media-placeholder").length;
 }

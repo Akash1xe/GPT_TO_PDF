@@ -1,6 +1,16 @@
 import type { ContentBlock } from "@/lib/conversation/content";
 import type { ConversationData } from "@/lib/conversation/conversation";
 
+export function countExternalImages(conversation: ConversationData): number {
+  const count=(block:ContentBlock):number=>{
+    if(block.type==="image")return /^(?:https?:|blob:)/i.test(block.src??"")?1:0;
+    if(block.type==="layout"||block.type==="blockquote")return block.blocks.reduce((sum,b)=>sum+count(b),0);
+    if(block.type==="ordered-list"||block.type==="unordered-list")return block.items.reduce((sum,item)=>sum+item.blocks.reduce((n,b)=>n+count(b),0),0);
+    return 0;
+  };
+  return conversation.messages.reduce((sum,m)=>sum+m.blocks.reduce((n,b)=>n+count(b),0),0);
+}
+
 /** URL-backed image elements may contact third-party servers from the print tab.
  * Suppress them by default. Self-contained data images and inline SVG remain.
  */

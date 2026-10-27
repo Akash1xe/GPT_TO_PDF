@@ -230,7 +230,12 @@ function contentOf(node: HtmlNode, warnings: ParserWarnings, depth: number): Con
     const blocks = parseSemanticBlocks(other, warnings, depth + 1);
     if (caption) {
       const firstMedia = blocks.find((block) => block.type === "image");
-      if (firstMedia?.type === "image" && !firstMedia.caption) firstMedia.caption = caption;
+      if (firstMedia?.type === "image" && !firstMedia.caption) {
+        firstMedia.caption = caption;
+        const link=figcaption&&children(figcaption).find(node=>tag(node)==="a");
+        const href=link&&safeLinkHref(attr(link,"href")??"");
+        if(href&&/^https?:/.test(href))firstMedia.captionHref=href;
+      }
       else blocks.push({ type: "paragraph", children: [{ type: "text", text: caption }] });
     }
     return blocks;

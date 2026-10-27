@@ -39,7 +39,7 @@ export function buildPrintStyles(preferences: ExportPreferences): string {
 html, body { margin: 0; padding: 0; }
 body { background: #f3f4f6; color: #171717; }
 a { color: inherit; text-decoration: underline; text-underline-offset: 1.5px; overflow-wrap: anywhere; }
-.print-toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #fff; border-bottom: 1px solid #e4e4e7; font: 13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.print-toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #fff; color: #18181b; border-bottom: 1px solid #e4e4e7; font: 13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 .print-toolbar-actions { display: flex; gap: 8px; }
 .print-toolbar button { border: 1px solid #d4d4d8; background: #fff; color: #18181b; border-radius: 8px; padding: 7px 11px; cursor: pointer; }
 .print-toolbar button.primary { background: #18181b; color: #fff; border-color: #18181b; }
@@ -134,6 +134,11 @@ thead { display: table-header-group; } tr { break-inside: avoid; }
 .message-body > :first-child { break-before: avoid-page; }
 .visual-card { box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .code-label { break-after: avoid; }
+.diagram-block { margin: .7em 0; padding: .6em; break-inside: avoid-page; text-align: center; }
+.diagram-block svg { display: block; width: 100%; height: auto; max-width: 100%; max-height: min(190mm, calc(var(--pdf-page-height) - var(--pdf-margin-top) - var(--pdf-margin-bottom) - 20mm)); margin: 0 auto; overflow: visible; }
+.diagram-block .node rect { rx: 12px; ry: 12px; }
+.diagram-warning { padding: .5em .7em; font-size: .85em; color: var(--pdf-muted); }
+.diagram-measurement { position: absolute; left: -100000px; top: 0; width: 1000px; visibility: hidden; }
 .visual-card { border: 1px solid #aaa; border-radius: 10px; padding: .8em; }
 .visual-control { display: flex; align-items: center; gap: .5em; margin: .35em 0; }
 .visual-panel { padding: .8em; border-radius: 10px; }
@@ -161,6 +166,8 @@ thead { display: table-header-group; } tr { break-inside: avoid; }
   .export-document, .export-document.theme-dark { width: auto; margin: 0; padding: 0; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .message { margin-bottom: var(--pdf-message-gap); }
   .assistant-only-document .message { margin-bottom: calc(var(--pdf-message-gap) * .72); }
+  .export-document > .message:last-child { margin-bottom: 0; }
+  .export-document > .message:last-child > .message-body { padding-bottom: 0; }
   .document-header { margin-bottom: .9em; }
   .code-block { overflow: visible; }
   .table-shell { overflow: visible; }

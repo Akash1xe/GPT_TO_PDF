@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { renderConversation, safePdfTitle } from "@/lib/pdf/conversation-renderer";
 import { buildPrintStyles } from "@/lib/pdf/print-styles";
 import { PRINT_DOCUMENT, PRINT_READY, preparePrintPayload } from "@/lib/pdf/print-job";
+import { renderMermaidDiagrams } from "@/lib/pdf/mermaid-renderer";
+import { markUnavailableImages } from "@/lib/pdf/image-renderer";
 
-async function readyForPrinting(document: Document): Promise<void> {
+async function readyForPrinting(document: Document): Promise<number> {
   const pending = Array.from(document.images).filter((img) => !img.complete);
   const images = Promise.all(pending.map((img) => new Promise<void>((resolve) => {
     img.addEventListener("load", () => resolve(), { once: true });
@@ -17,10 +19,11 @@ async function readyForPrinting(document: Document): Promise<void> {
     new Promise<void>((resolve) => window.setTimeout(resolve, maximum)),
   ]);
   await Promise.all([
-    wait(images, 3500),
+    wait(images, 12_000),
     document.fonts ? wait(document.fonts.ready, 4000) : Promise.resolve(),
   ]);
   await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  return markUnavailableImages(document);
 }
 
 export function PrintDocumentClient() {
@@ -34,7 +37,8 @@ export function PrintDocumentClient() {
   useEffect(() => {
     if (!window.opener) return;
     let announced = false;
-    const onMessage = (event: MessageEvent) => {
+    let disposed = false;
+    const onMessage = async (event: MessageEvent) => {
       if (event.origin !== window.location.origin || event.source !== window.opener) return;
       if (loaded.current || !event.data || event.data.type !== PRINT_DOCUMENT) return;
       try {
@@ -48,8 +52,13 @@ export function PrintDocumentClient() {
         document.title = printTitle.current;
         root.current?.replaceChildren(renderConversation(document, validated.conversation, validated.preferences));
         loaded.current = true;
+        setStatus("Preparing diagrams and images for printing…");
+        const diagrams = root.current ? await renderMermaidDiagrams(root.current, validated.preferences.pdfTheme) : { failed: 0 };
+        const missingImages=await readyForPrinting(document);
+        if (disposed) return;
         setAvailable(true);
-        setStatus("Ready. Select Print / Save as PDF, then choose Save as PDF in your browser.");
+        const notes=[diagrams.failed?`${diagrams.failed} diagram(s) retained as source`:"",missingImages?`${missingImages} image(s) shown as placeholders`:""].filter(Boolean);
+        setStatus(notes.length?`Ready. ${notes.join("; ")}. Select Print / Save as PDF.`:"Ready. Select Print / Save as PDF, then choose Save as PDF in your browser.");
       } catch (error) {
         setStatus(error instanceof Error ? error.message : "Unable to render the conversation safely.");
       }
@@ -68,6 +77,7 @@ export function PrintDocumentClient() {
       if (!loaded.current && announced) setStatus("Unable to receive the conversation. Return to the inspector and open print preview again.");
     }, 20_000);
     return () => {
+      disposed = true;
       window.removeEventListener("message", onMessage);
       window.clearInterval(timer);
       window.clearTimeout(timeout);

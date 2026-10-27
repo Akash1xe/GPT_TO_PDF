@@ -2,7 +2,11 @@
 
 ## Current shared-link conversion fix (October 27, 2026)
 
+**System-design lesson fidelity:** conditional quiz state, mapped checkboxes, progress bars, native/Markdown LaTeX, image attribution links, grid cards and client-defined Mermaid widgets are preserved. A new image-inclusive preview action makes online illustrations explicit; printing waits for assets, and trailing spacing no longer creates a blank final page. The supplied lesson was regenerated and visually checked as an eight-page PDF. See [system-design comparison notes](docs/SYSTEM_DESIGN_PDF_FIX.md).
+
 **PDF fidelity update:** shared conversations now reconstruct supported static ChatGPT cards, links, controls, lists and image metadata instead of printing UI source code. Numbered-list/bullet printing and the PDF filename are repaired. The comparison conversation now contains 34 visible messages; generated images available only through internal file references are labeled explicitly. See [PDF comparison and remaining image limitation](docs/PDF_COMPARISON_FIX.md).
+
+**Mermaid diagrams:** fenced `mermaid` blocks now render as vector diagrams in the print preview and PDF, in the selected light/dark theme. Printing waits for diagram preparation. Invalid or oversized diagrams retain their original source with a warning. Rendering is browser-local; imported configuration, HTML labels, callbacks and external diagram assets are disabled. Normal programming code remains a code block.
 
 **Public shared-link import is now implemented.** The older chunk notes below document earlier milestones; their statements that retrieval is disabled predate this fix.
 

@@ -151,6 +151,7 @@ export interface ImageBlock {
   width?: number;
   height?: number;
   caption?: string;
+  captionHref?: string;
   sourceType: ImageSourceType;
   mediaKind: "image" | "svg" | "canvas";
 }

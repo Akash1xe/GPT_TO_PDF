@@ -269,6 +269,11 @@ function block(ctx: Context, input: unknown, path: string, depth: number): Conte
       if (src !== undefined) b.src = src;
       if (v.alt !== undefined) b.alt = text(ctx, v.alt, `${path}.alt`, 10_000);
       if (v.caption !== undefined) b.caption = text(ctx, v.caption, `${path}.caption`, 10_000);
+      if (v.captionHref !== undefined) {
+        const href=safeSourceUrl(text(ctx,v.captionHref,`${path}.captionHref`,4096));
+        if(!href)invalid(`${path}.captionHref`,"Unsafe image attribution URL.");
+        b.captionHref=href;
+      }
       for (const key of ["width", "height"] as const) {
         if (v[key] !== undefined) b[key] = number(v[key], `${path}.${key}`, 0, 100_000);
       }
